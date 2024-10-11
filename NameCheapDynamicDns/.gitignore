@@ -11,3 +11,13 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+/NameCheapDynamicDns/obj/*
+/NameCheapDynamicDns/bin/*
+
+/NameCheapDynamicDns/.idea/*
+/NameCheapDynamicDns/DynDnsDynamicLibrary/obj/*
+/NameCheapDynamicDns/DynDnsDynamicLibrary/bin/*
+/NameCheapDynamicDns/DynDnsApiManager/bin/*
+/.idea/*
+/NameCheapDynamicDns/DynDnsApiManager/obj/*

@@ -1,4 +1,6 @@
-﻿namespace DynDnsDynamicLibrary;
+﻿using System.Threading.Tasks;
+
+namespace DynDnsDynamicLibrary;
 
 public interface IDynamicDnsHelper
 {

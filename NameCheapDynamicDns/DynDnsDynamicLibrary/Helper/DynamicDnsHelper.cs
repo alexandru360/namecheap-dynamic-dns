@@ -1,5 +1,8 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using DynDnsDynamicLibrary.Config;
 using Microsoft.Extensions.Options;
 using Serilog;
