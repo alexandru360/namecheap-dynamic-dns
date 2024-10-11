@@ -1,9 +1,8 @@
-﻿using System;
-using System.Net;
-using System.Net.Http;
+﻿using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using DynDnsDynamicLibrary.Config;
+using DynDnsDynamicLibrary.Models;
 using Microsoft.Extensions.Options;
 using Serilog;
 
@@ -14,18 +13,18 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
     private readonly string[] _hosts = config.Value.Hosts.Split(',');
     private readonly string _domain = config.Value.Domain;
     private readonly string _password = config.Value.Password;
+    private readonly string _updateDomainsApiUrl = config.Value.UpdateDomainsApiUrl;
+    private readonly string _ipCheckUrl = config.Value.IpCheckUrl;
 
-    private string _hostsUpdated = "";
-    private string _hostsUnchanged = "";
+    private readonly DynamicDnsReportModel? _hostsChanges = new DynamicDnsReportModel();
 
-    public async Task UpdateDns()
+    public async Task<DynamicDnsReportModel?> UpdateDns()
     {
         // Get environment variables
-
         if (string.IsNullOrEmpty(_domain) || string.IsNullOrEmpty(_password))
         {
             logger.Information("Missing required environment variables.");
-            return;
+            return null;
         }
 
         // Get current WAN IP
@@ -34,7 +33,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
         if (string.IsNullOrEmpty(newIp))
         {
             logger.Information("Failed to retrieve WAN IP.");
-            return;
+            return null;
         }
 
         foreach (var host in _hosts)
@@ -46,7 +45,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
             if (newIp == currentIp)
             {
-                _hostsUnchanged += $"{fullDomain}\n";
+                _hostsChanges!.HostsUnchanged += $"{fullDomain}\n";
                 continue;
             }
 
@@ -56,7 +55,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
             // Process the response
             if (IsUpdateSuccessful(response))
             {
-                _hostsUpdated += $"{fullDomain}\n";
+                _hostsChanges!.HostsUpdated += $"{fullDomain}\n";
             }
             else
             {
@@ -66,6 +65,9 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
         // Log results
         LogResults(newIp);
+        
+        // return updates
+        return _hostsChanges;
     }
 
     private async Task<string?> GetCurrentWanIp()
@@ -73,7 +75,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
         using HttpClient client = new HttpClient();
         try
         {
-            return await client.GetStringAsync("http://ipinfo.io/ip");
+            return await client.GetStringAsync(_ipCheckUrl);
         }
         catch (Exception ex)
         {
@@ -98,7 +100,13 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
     private async Task<string?> UpdateDnsRecord(string host, string? newIp)
     {
-        string url = $"https://dynamicdns.park-your-domain.com/update?host={host}&domain={_domain}&password={_password}&ip={newIp}";
+        var urlBuilder = new StringBuilder(_updateDomainsApiUrl);
+        urlBuilder.Replace("{host}", host)
+            .Replace("{domain}", _domain)
+            .Replace("{password}", _password)
+            .Replace("{newIp}", newIp);
+
+        string url = urlBuilder.ToString();
 
         using HttpClient client = new HttpClient();
         try
@@ -121,17 +129,17 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
     private void LogResults(string? newIp)
     {
-        if (!string.IsNullOrEmpty(_hostsUpdated))
+        if (!string.IsNullOrEmpty(_hostsChanges?.HostsUpdated))
         {
-            logger.Error($"The following hosts were updated with IP {newIp}:\n{_hostsUpdated}");
+            logger.Error($"The following hosts were updated with IP {newIp}:\n{_hostsChanges.HostsUpdated}");
         }
 
-        if (!string.IsNullOrEmpty(_hostsUnchanged))
+        if (!string.IsNullOrEmpty(_hostsChanges?.HostsUnchanged))
         {
-            logger.Error($"The following hosts were unchanged:\n{_hostsUnchanged}");
+            logger.Error($"The following hosts were unchanged:\n{_hostsChanges.HostsUnchanged}");
         }
 
-        if (string.IsNullOrEmpty(_hostsUpdated))
+        if (string.IsNullOrEmpty(_hostsChanges?.HostsUpdated))
         {
             logger.Error("No hosts were updated.");
         }
