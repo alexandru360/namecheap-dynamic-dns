@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NameCheapDynamicDns", "NameCheapDynamicDns.csproj", "{FC4D3204-B943-41C7-94FD-ED297183B7AD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2E0165F2-0806-4198-BD71-16F66AB30B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E0165F2-0806-4198-BD71-16F66AB30B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E0165F2-0806-4198-BD71-16F66AB30B8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E0165F2-0806-4198-BD71-16F66AB30B8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FC4D3204-B943-41C7-94FD-ED297183B7AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FC4D3204-B943-41C7-94FD-ED297183B7AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FC4D3204-B943-41C7-94FD-ED297183B7AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FC4D3204-B943-41C7-94FD-ED297183B7AD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

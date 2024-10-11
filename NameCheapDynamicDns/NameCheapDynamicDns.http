@@ -1,0 +1,6 @@
+@NameCheapDynamicDns_HostAddress = http://localhost:5101
+
+GET {{NameCheapDynamicDns_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
