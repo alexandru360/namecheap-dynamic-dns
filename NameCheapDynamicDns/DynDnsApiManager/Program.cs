@@ -13,11 +13,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
-// Register Serilog
-builder.Host.UseSerilog();
+builder.Host.UseSerilog(); // Register Serilog
 
 builder.Services.AddSingleton(Log.Logger);
-
 
 builder.Services.Configure<NamecheapConfig>(builder.Configuration.GetSection("NamecheapConfig")); // Configure NamecheapConfig options
 builder.Services.AddConfig(builder.Configuration); // Register services from DynDnsDynamicLibrary
@@ -40,9 +38,9 @@ app.UseHttpsRedirection();
 
 app.MapGet("/get-dns-status", async (IDynamicDnsHelper svc) =>
     {
-        await svc.UpdateDns();
+        var response = await svc.UpdateDns();
 
-        return Results.Ok("Hello World!");
+        return Results.Ok(response);
     })
     .WithOpenApi();
 
