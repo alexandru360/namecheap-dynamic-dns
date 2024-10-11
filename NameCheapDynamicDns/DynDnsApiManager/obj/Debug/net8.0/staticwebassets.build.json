@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "Y7+HHpUUqo8DHV47bNC6LHFZr9DAz0RWhZ9KpRyST9g=",
+  "Source": "DynDnsApiManager",
+  "BasePath": "_content/DynDnsApiManager",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

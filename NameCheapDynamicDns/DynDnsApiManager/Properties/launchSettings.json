@@ -4,8 +4,8 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:14797",
-      "sslPort": 44343
+      "applicationUrl": "http://localhost:64132",
+      "sslPort": 44350
     }
   },
   "profiles": {
@@ -14,12 +14,9 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5101",
+      "applicationUrl": "http://localhost:5173",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "HOSTS": "@,authelia,authentik,bitwarden,code,camdg,deluge,gitea,guacamole,jenkins,mail,minecraft,nextcloud,photos,phpmyadmin,plex,portainer,proxymanager,qtorrent,radarr,sonarr,verdacio,www",
-        "DOMAIN": "alexserv.xyz",
-        "PASSWORD": "abf5304cacd54e2ab2378e86b7048bf3"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "https": {
@@ -27,7 +24,7 @@
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7291;http://localhost:5101",
+      "applicationUrl": "https://localhost:7237;http://localhost:5173",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

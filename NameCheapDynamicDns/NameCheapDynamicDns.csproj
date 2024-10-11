@@ -16,4 +16,10 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="NameCheapDynamicDnsHelper\obj\NameCheapDynamicDnsHelper.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="NameCheapDynamicDnsHelper\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="NameCheapDynamicDnsHelper\obj\project.packagespec.json" />
+    </ItemGroup>
+
 </Project>
