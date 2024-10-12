@@ -16,7 +16,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
     private readonly string _updateDomainsApiUrl = config.Value.UpdateDomainsApiUrl;
     private readonly string _ipCheckUrl = config.Value.IpCheckUrl;
 
-    private readonly DynamicDnsReportModel? _hostsChanges = new DynamicDnsReportModel();
+    private DynamicDnsReportModel? _hostsChanges = new ();
 
     public async Task<DynamicDnsReportModel?> UpdateDns()
     {
@@ -45,7 +45,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
             if (newIp == currentIp)
             {
-                _hostsChanges!.HostsUnchanged += $"{fullDomain}\n";
+                _hostsChanges!.HostsUnchanged.Add(fullDomain);
                 continue;
             }
 
@@ -55,7 +55,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
             // Process the response
             if (IsUpdateSuccessful(response))
             {
-                _hostsChanges!.HostsUpdated += $"{fullDomain}\n";
+                _hostsChanges!.HostsUpdated.Add(fullDomain);
             }
             else
             {
@@ -129,17 +129,17 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
     private void LogResults(string? newIp)
     {
-        if (!string.IsNullOrEmpty(_hostsChanges?.HostsUpdated))
+        if (!Convert.ToBoolean(_hostsChanges?.HostsUpdated.Count.Equals(0)))
         {
             logger.Error($"The following hosts were updated with IP {newIp}:\n{_hostsChanges.HostsUpdated}");
         }
 
-        if (!string.IsNullOrEmpty(_hostsChanges?.HostsUnchanged))
+        if (!Convert.ToBoolean(_hostsChanges?.HostsUnchanged.Count.Equals(0)))
         {
             logger.Error($"The following hosts were unchanged:\n{_hostsChanges.HostsUnchanged}");
         }
 
-        if (string.IsNullOrEmpty(_hostsChanges?.HostsUpdated))
+        if (Convert.ToBoolean(_hostsChanges?.HostsUpdated.Count.Equals(0)))
         {
             logger.Error("No hosts were updated.");
         }

@@ -1,7 +1,8 @@
 ﻿namespace DynDnsDynamicLibrary.Models;
 
+[Serializable]
 public class DynamicDnsReportModel
 {
-    public string HostsUpdated = "";
-    public string HostsUnchanged = "";
+    public IList<string> HostsUpdated = new List<string>();
+    public IList<string> HostsUnchanged = new List<string>();
 }
