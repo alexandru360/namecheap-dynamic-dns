@@ -1,13 +1,19 @@
-﻿FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
+﻿FROM alex360/aspnet8-sdk:latest
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy everything and restore as distinct layers
-COPY . ./
-RUN dotnet publish -c Release -o out
+# Copy the application files to the container
+COPY . .
 
-# Build runtime image
-FROM mcr.microsoft.com/dotnet/aspnet:7.0
-WORKDIR /app
-COPY --from=build-env /app/out .
+# Restore dependencies
+RUN dotnet restore
 
-ENTRYPOINT ["dotnet", "DDNSUpdater.dll"]
+# Build the application
+RUN dotnet build --no-restore -c Release
+
+# Publish the application
+RUN dotnet publish --no-restore -c Release -o out
+
+# Set the entry point for the application
+ENTRYPOINT ["dotnet", "out/YourApplication.dll"]
