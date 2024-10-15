@@ -2,78 +2,82 @@ using DynDnsCronJob.Cron;
 using DynDnsCronJob.Models;
 using DynDnsDynamicLibrary;
 using DynDnsDynamicLibrary.Config;
-using DynDnsDynamicLibrary.Models;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
-
-builder.Host.UseSerilog(); // Register Serilog
-
-builder.Services.AddSingleton(Log.Logger);
-
-// Enable configuration reload on change
-builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
-    reloadOnChange: true);
-
-builder.Services.Configure<NamecheapConfig>(
-    builder.Configuration.GetSection("NamecheapConfig")); // Configure NamecheapConfig options
-builder.Services.Configure<CronJobConfig>(
-    builder.Configuration.GetSection("CronJob")); // Configure CronJobConfig options
-
-builder.Services.AddConfig(builder.Configuration); // Register services from DynDnsDynamicLibrary
-
-builder.Services.AddControllers().AddNewtonsoftJson();
-
-// Add Worker service
-builder.Services.AddHostedService<DynamicDnsWorker>();
-
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-app.UseSerilogRequestLogging(options =>
+try
 {
-    options.GetLevel = (httpContext, elapsed, ex) =>
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Configure Serilog
+    Log.Logger = new LoggerConfiguration()
+        .ReadFrom.Configuration(builder.Configuration)
+        .CreateLogger();
+
+    builder.Host.UseSerilog(); // Register Serilog
+
+    builder.Services.AddSingleton(Log.Logger);
+
+    // Enable configuration reload on change
+    builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true,
+        reloadOnChange: true);
+
+    builder.Services.Configure<NamecheapConfig>(
+        builder.Configuration.GetSection("NamecheapConfig")); // Configure NamecheapConfig options
+    builder.Services.Configure<CronJobConfig>(
+        builder.Configuration.GetSection("CronJob")); // Configure CronJobConfig options
+
+    builder.Services.AddConfig(builder.Configuration); // Register services from DynDnsDynamicLibrary
+
+    builder.Services.AddControllers().AddNewtonsoftJson();
+
+    // Add Worker service
+    builder.Services.AddHostedService<DynamicDnsWorker>();
+
+    // Add services to the container.
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
+
+    var app = builder.Build();
+
+    app.UseSerilogRequestLogging(options =>
     {
-        if (ex != null || httpContext.Response.StatusCode > 499)
+        options.GetLevel = (httpContext, elapsed, ex) =>
         {
-            return LogEventLevel.Error;
-        }
-        else if (httpContext.Response.StatusCode > 399)
-        {
-            return LogEventLevel.Warning;
-        }
+            if (ex != null || httpContext.Response.StatusCode > 499)
+            {
+                return LogEventLevel.Error;
+            }
+            else if (httpContext.Response.StatusCode > 399)
+            {
+                return LogEventLevel.Warning;
+            }
 
-        return LogEventLevel.Information;
-    };
-});
+            return LogEventLevel.Information;
+        };
+    });
 
-app.UseSwagger();
-app.UseSwaggerUI();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 
-app.UseHttpsRedirection();
+    app.UseHttpsRedirection();
 
-app.MapGet("/get-dns-status",
-        async (IDynamicDnsHelper svc) =>
-        {
-            await svc.UpdateDns();
-            return Results.Ok("Dns update process executed; check the logs!");
-        })
-    .WithOpenApi();
+    app.MapGet("/get-dns-status",
+            async (IDynamicDnsHelper svc) =>
+            {
+                await svc.UpdateDns();
+                return Results.Ok("Dns update process executed; check the logs!");
+            })
+        .WithOpenApi();
 
-app.Run();
+    app.Run();
+}
+catch (Exception ex)
+{
+    Log.Error(ex, "An unhandled exception occurred.");
+}
+finally
+{
+    Log.CloseAndFlush();
+}
