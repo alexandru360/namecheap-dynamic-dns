@@ -26,3 +26,6 @@
 
 /NameCheapDynamicDns/DynDnsCronJob/obj/*
 /NameCheapDynamicDns/DynDnsCronJob/bin/*
+
+/NameCheapDynamicDns/DynDnsApiManager/logs/log-*.txt
+/NameCheapDynamicDns/NameCheapDynamicDns.sln.DotSettings.user

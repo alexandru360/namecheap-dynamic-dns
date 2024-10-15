@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using DynDnsDynamicLibrary.Config;
 using DynDnsDynamicLibrary.Models;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace DynDnsDynamicLibrary.Helper;
@@ -23,7 +24,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
         // Get environment variables
         if (string.IsNullOrEmpty(_domain) || string.IsNullOrEmpty(_password))
         {
-            logger.Information("Missing required environment variables.");
+            logger.Error("Missing required environment variables.");
             return null;
         }
 
@@ -59,7 +60,7 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
             }
             else
             {
-                logger.Error($"Error updating {fullDomain}. Response: {response}");
+                logger.Information($"Updating {fullDomain}. Response: {JsonConvert.SerializeObject(response)}");
             }
         }
 
@@ -131,17 +132,17 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
     {
         if (!Convert.ToBoolean(_hostsChanges?.HostsUpdated.Count.Equals(0)))
         {
-            logger.Error($"The following hosts were updated with IP {newIp}:\n{_hostsChanges.HostsUpdated}");
+            logger.Information($"The following hosts were updated with IP {newIp}: {JsonConvert.SerializeObject(_hostsChanges.HostsUnchanged)}");
         }
 
         if (!Convert.ToBoolean(_hostsChanges?.HostsUnchanged.Count.Equals(0)))
         {
-            logger.Error($"The following hosts were unchanged:\n{_hostsChanges.HostsUnchanged}");
+            logger.Information($"The following hosts were unchanged: {JsonConvert.SerializeObject(_hostsChanges.HostsUnchanged)}");
         }
 
         if (Convert.ToBoolean(_hostsChanges?.HostsUpdated.Count.Equals(0)))
         {
-            logger.Error("No hosts were updated.");
+            logger.Information("No hosts were updated.");
         }
     }
 }

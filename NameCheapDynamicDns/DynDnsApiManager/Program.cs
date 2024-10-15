@@ -1,3 +1,5 @@
+using DynDnsCronJob.Cron;
+using DynDnsCronJob.Models;
 using DynDnsDynamicLibrary;
 using DynDnsDynamicLibrary.Config;
 using Microsoft.AspNetCore.Builder;
@@ -11,7 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
+    .ReadFrom.Configuration(builder.Configuration)
     .CreateLogger();
 
 builder.Host.UseSerilog(); // Register Serilog
@@ -22,9 +24,14 @@ builder.Services.AddSingleton(Log.Logger);
 builder.Configuration.AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true);
 
 builder.Services.Configure<NamecheapConfig>(builder.Configuration.GetSection("NamecheapConfig")); // Configure NamecheapConfig options
+builder.Services.Configure<CronJobConfig>(builder.Configuration.GetSection("CronJob")); // Configure CronJobConfig options
+
 builder.Services.AddConfig(builder.Configuration); // Register services from DynDnsDynamicLibrary
 
 builder.Services.AddControllers().AddNewtonsoftJson();
+
+// Add Worker service
+builder.Services.AddHostedService<DynamicDnsWorker>();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

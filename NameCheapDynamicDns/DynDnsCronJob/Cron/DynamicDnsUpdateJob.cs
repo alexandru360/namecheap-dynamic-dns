@@ -1,12 +1,25 @@
-﻿using DynDnsDynamicLibrary;
-using Quartz;
+﻿using DynDnsCronJob.Models;
+using DynDnsDynamicLibrary;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace DynDnsCronJob.Cron;
 
-public class DynamicDnsUpdateJob(IDynamicDnsHelper dynamicDnsHelper) : IJob
+public class DynamicDnsWorker(
+    IDynamicDnsHelper dynamicDnsHelper,
+    IOptions<CronJobConfig> config) : BackgroundService
 {
-    public async Task Execute(IJobExecutionContext context)
+    protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await dynamicDnsHelper.UpdateDns();
+        return Task.Run(async () =>
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await dynamicDnsHelper.UpdateDns();
+
+                var time = config.Value.UpdateInMinutes;
+                await Task.Delay(TimeSpan.FromMinutes(time), stoppingToken);
+            }
+        }, stoppingToken);
     }
 }
