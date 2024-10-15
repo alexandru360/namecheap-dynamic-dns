@@ -21,6 +21,8 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
 
     public async Task<DynamicDnsReportModel?> UpdateDns()
     {
+        _hostsChanges = new ();
+        
         // Get environment variables
         if (string.IsNullOrEmpty(_domain) || string.IsNullOrEmpty(_password))
         {
