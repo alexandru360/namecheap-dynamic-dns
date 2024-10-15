@@ -76,7 +76,9 @@ public class DynamicDnsHelper(ILogger logger, IOptions<NamecheapConfig> config) 
         using HttpClient client = new HttpClient();
         try
         {
-            return await client.GetStringAsync(_ipCheckUrl);
+            var response = await client.GetStringAsync(_ipCheckUrl);
+            logger.Information($"Current ip found: {response}");
+            return response;
         }
         catch (Exception ex)
         {
